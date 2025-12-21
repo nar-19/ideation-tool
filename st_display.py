@@ -1,7 +1,8 @@
 import streamlit as st
 import os
 import pandas as pd
-from google import genai
+import google.generativeai as genai
+from google.generativeai import types
 from google.genai import types
 import streamlit as st
 
@@ -133,6 +134,7 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
 
 
