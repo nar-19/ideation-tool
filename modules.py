@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 # from dotenv import load_dotenv
 from datetime import datetime
-from google import genai
-from google.genai import types
+import google.generativeai as genai
+from google.generativeai import types
 from PIL import Image as pilImage
 import os, json, random, string, time, io, shutil
 
@@ -206,4 +206,5 @@ def generate_images(content_ideas):
             
             i = i+1
             time.sleep(30)
+
 
