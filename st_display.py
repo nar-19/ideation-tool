@@ -3,7 +3,6 @@ import os
 import pandas as pd
 import google.generativeai as genai
 from google.generativeai import types
-from google.genai import types
 import streamlit as st
 
 # Initialize the API key from secrets file
@@ -134,6 +133,7 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
 
 
