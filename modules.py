@@ -7,13 +7,8 @@ from google.genai import types
 from PIL import Image as pilImage
 import os, json, random, string, time, io, shutil
 
-# from dotenv import load_dotenv # Load env
-# # Load environment variables from .env file
-# load_dotenv()
-# # Get the API key from the .env file
-# # client = genai.Client(api_key=os.environ.get('API_KEY'))
-# client = genai.Client(api_key=os.getenv("API_KEY"))
-
+# Initialize the API key from secrets file
+client = genai.Client(api_key = st.secrets["API_KEY"])
 
 def generate_llm_output(prompt):
     response_json = client.models.generate_content(
@@ -206,6 +201,7 @@ def generate_images(content_ideas):
             
             i = i+1
             time.sleep(30)
+
 
 
 
