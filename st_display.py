@@ -2,13 +2,15 @@ import streamlit as st
 import os
 import pandas as pd
 from modules import *
-
 from dotenv import load_dotenv # Load envs
+import streamlit as st
+
 # Load environment variables from .env file
 load_dotenv()
 # Get the API key from the .env file
 # client = genai.Client(api_key=os.environ.get('API_KEY'))
-client = genai.Client(api_key=os.getenv("API_KEY"))
+# client = genai.Client(api_key=os.getenv("API_KEY"))
+api_key = st.secrets["API_KEY"]
 
 # # --- Data Loading ---
 # df_idea = pd.read_csv("output/llm-output.csv")
@@ -133,4 +135,5 @@ if st.session_state.trend_data:
 # Display Output
 if st.session_state.content_ideas:
     st.write('---')
+
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
