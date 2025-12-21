@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from dotenv import load_dotenv # Load env
+# from dotenv import load_dotenv
 from datetime import datetime
 from google import genai
 from google.genai import types
@@ -206,3 +206,4 @@ def generate_images(content_ideas):
             
             i = i+1
             time.sleep(30)
+
