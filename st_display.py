@@ -1,8 +1,8 @@
 import streamlit as st
 import os
 import pandas as pd
-from modules import *
-from dotenv import load_dotenv # Load envs
+# from modules import *
+# from dotenv import load_dotenv
 import streamlit as st
 
 # Load environment variables from .env file
@@ -113,8 +113,8 @@ if st.session_state.trend_data:
 
             # Function (1)
             # st.session_state.content_ideas = generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
-            content_ideas = generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
-            store_ideas(content_ideas)
+            content_ideas = modules.generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
+            modules.store_ideas(content_ideas)
             st.session_state.content_ideas = content_ideas
             
             st.write("Creating storyboard visuals...")
@@ -124,11 +124,11 @@ if st.session_state.trend_data:
             # Function (2)
             # Create new directory 'image'. If it already exists, clear the folder and recreate.
             directory_name = "image"
-            create_or_clear_folder(directory_name)
+            modules.create_or_clear_folder(directory_name)
 
             # Function (3)
             # Generate images per shot and display output
-            generate_images(content_ideas)
+            modules.generate_images(content_ideas)
             
             status.update(label="Storyboard Complete!", state="complete", expanded=False)
 
@@ -137,4 +137,5 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
