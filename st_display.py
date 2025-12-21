@@ -86,7 +86,7 @@ if 'selected_influencer' not in st.session_state: st.session_state.selected_infl
 # Step 1: Discover Trend
 st.header("Step 1: Discover the Trend")
 if st.button('1. Get Current Trend'):
-    st.session_state.trend_data = generate_trend()
+    st.session_state.trend_data = modules.generate_trend()
     st.session_state.content_ideas = None # Reset previous ideas
 
 if st.session_state.trend_data:
@@ -133,6 +133,7 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
 
 
