@@ -105,7 +105,7 @@ if st.session_state.trend_data:
     # Step 3: Generate Storyboard
     st.header("Step 3: Generate Storyboard")
     if st.button('3. Generate Content Idea & Storyboard'):
-        with st.status("Baking ideas... 🧑🏼‍🍳", expanded=True) as status:
+        with st.status("Baking ideas... 🧑🏼‍🍳 This takes a few minutes", expanded=True) as status:
             st.write("Generating text content...")
 
             # Function (1)
@@ -134,6 +134,7 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
 
 
