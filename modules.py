@@ -5,6 +5,7 @@ from datetime import datetime
 from google import genai
 from google.genai import types
 from PIL import Image as pilImage
+import streamlit as st
 import os, json, random, string, time, io, shutil
 
 # Initialize the API key from secrets file
@@ -201,6 +202,7 @@ def generate_images(content_ideas):
             
             i = i+1
             time.sleep(30)
+
 
 
 
