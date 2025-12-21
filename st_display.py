@@ -4,6 +4,7 @@ import pandas as pd
 from google import genai
 from google.genai import types
 import streamlit as st
+from modules import generate_trend, generate_ideas, store_ideas, create_or_clear_folder, generate_images
 
 # Initialize the API key from secrets file
 client = genai.Client(api_key = st.secrets["API_KEY"])
@@ -86,7 +87,7 @@ if 'selected_influencer' not in st.session_state: st.session_state.selected_infl
 # Step 1: Discover Trend
 st.header("Step 1: Discover the Trend")
 if st.button('1. Get Current Trend'):
-    st.session_state.trend_data = modules.generate_trend()
+    st.session_state.trend_data = generate_trend()
     st.session_state.content_ideas = None # Reset previous ideas
 
 if st.session_state.trend_data:
@@ -109,8 +110,8 @@ if st.session_state.trend_data:
 
             # Function (1)
             # st.session_state.content_ideas = generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
-            content_ideas = modules.generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
-            modules.store_ideas(content_ideas)
+            content_ideas = generate_ideas(st.session_state.trend_data, st.session_state.selected_influencer)
+            store_ideas(content_ideas)
             st.session_state.content_ideas = content_ideas
             
             st.write("Creating storyboard visuals...")
@@ -120,11 +121,11 @@ if st.session_state.trend_data:
             # Function (2)
             # Create new directory 'image'. If it already exists, clear the folder and recreate.
             directory_name = "image"
-            modules.create_or_clear_folder(directory_name)
+            create_or_clear_folder(directory_name)
 
             # Function (3)
             # Generate images per shot and display output
-            modules.generate_images(content_ideas)
+            generate_images(content_ideas)
             
             status.update(label="Storyboard Complete!", state="complete", expanded=False)
 
@@ -133,6 +134,7 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
 
 
 
