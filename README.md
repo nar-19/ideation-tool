@@ -1,7 +1,7 @@
 This is a demo/pilot Streamlit tool that is written in a Jupyter notebook.
 This app demonstrates a storyboard ideation using an LLM model (Gemini).
-1) The app calls Gemini to generate one current TikTok trend and a catchy ideation story based on the trend.
-2) From the generated storyline, Gemini Nano Banana is used to produce sample images to support the storyboarding activity.
+1. The app calls Gemini to generate one current TikTok trend and a catchy ideation story based on the trend.
+2. From the generated storyline, Gemini Nano Banana is used to produce sample images to support the storyboarding activity.
 The tool can be tried out at the link <https://content-ideation-app.streamlit.app/>
 <br>
 <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/28235f01-dd8f-417a-a81a-88d18743064d" />
@@ -10,8 +10,6 @@ The tool can be tried out at the link <https://content-ideation-app.streamlit.ap
 <br>
 <br>
 <br>
-3) The flowchart of the Python script is as follows;
-<br>
-<br>
+3. The flowchart of the Python script is as follows;
 <img width="1719" height="1811" alt="image" src="https://github.com/user-attachments/assets/2ee5a133-8777-4667-901f-8d6710de03cc" />
 
