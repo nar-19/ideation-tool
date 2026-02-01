@@ -15,62 +15,85 @@ client = genai.Client(api_key = st.secrets["API_KEY"])
 
 # --- Function to generate UI using Native Streamlit Components ---
 def display_native_storyboard(idea_data, selected_influencer_type):
-    # Data extraction
-    idea_data = idea_data[0]
-    trend_name = idea_data['trend_name']
-    trend_description = idea_data['trend_description']
-    idea_title = idea_data['idea_title']
-    idea_steps = idea_data['idea_steps']
-    content_note = idea_data['content_note']
+    try:
+        # 1. Validation: Check if idea_data is valid before proceeding
+        if not idea_data or not isinstance(idea_data, list):
+            st.error("❌ No data received or data format is incorrect.")
+            return
 
-    # 1. Main Container (Replacing .idea-card)
-    with st.container(border=True):
-        st.subheader(f"💡 Ideation for {selected_influencer_type}")
-        st.title(idea_title)
+        # Data extraction
+        idea_data = idea_data[0]
         
-        # Trend Context
-        with st.expander("📌 View Trend Context", expanded=True):
-            st.markdown(f"**Trend Name:** {trend_name}")
-            st.markdown(f"**Description:** {trend_description}")
+        # Using .get() is safer than square brackets to avoid KeyErrors
+        trend_name = idea_data.get('trend_name', 'Unknown Trend')
+        trend_description = idea_data.get('trend_description', 'No description available.')
+        idea_title = idea_data.get('idea_title', 'Untitled Idea')
+        idea_steps = idea_data.get('idea_steps', {})
+        content_note = idea_data.get('content_note', {})
 
-        st.divider()
+        with st.container(border=True):
+            st.subheader(f"💡 Ideation for {selected_influencer_type}")
+            st.title(idea_title)
+            
+            with st.expander("📌 View Trend Context", expanded=True):
+                st.markdown(f"**Trend Name:** {trend_name}")
+                st.markdown(f"**Description:** {trend_description}")
 
-        # 2. Idea Steps (Replacing .shot-item)
-        st.header("🎬 Storyboard Steps")
-        
-        for shot_key, shot_description in idea_steps.items():
-            # Extract shot number for image filename
-            shot_number = shot_key.split(' ')[1]
-            image_filename = f"image/image_{str(shot_number)}.png"
+            st.divider()
 
-            # Create a nested container for each shot
-            with st.container(border=True):
-                col_text, col_img = st.columns([1, 1])
-                
-                with col_text:
-                    st.markdown(f"### {shot_key.capitalize()}")
-                    st.write(shot_description)
-                
-                with col_img:
-                    if os.path.exists(image_filename):
-                        # Native st.image handles local paths automatically
-                        st.image(image_filename, width='stretch', caption=f"Visual for {shot_key}")
-                    else:
-                        st.warning(f"Image_{shot_number}.png not found.")
+            st.header("🎬 Storyboard Steps")
+            
+            # 2. Logic Protection: Ensure idea_steps is iterable
+            if not idea_steps:
+                st.info("No storyboard steps found for this idea.")
+            else:
+                for shot_key, shot_description in idea_steps.items():
+                    try:
+                        # Parsing the shot number can be fragile (e.g., if key is "Shot1" instead of "Shot 1")
+                        parts = shot_key.split(' ')
+                        shot_number = parts[1] if len(parts) > 1 else "X"
+                        image_filename = f"image/image_{str(shot_number)}.png"
 
-        st.divider()
+                        with st.container(border=True):
+                            col_text, col_img = st.columns([1, 1])
+                            
+                            with col_text:
+                                st.markdown(f"### {shot_key.capitalize()}")
+                                st.write(shot_description)
+                            
+                            with col_img:
+                                if os.path.exists(image_filename):
+                                    st.image(image_filename, use_container_width=True, caption=f"Visual for {shot_key}")
+                                else:
+                                    st.warning(f"Image for {shot_key} is missing.")
+                    except Exception as shot_error:
+                        st.error(f"Error rendering {shot_key}: {shot_error}")
 
-        # 3. Content Notes (Replacing .content-note-list)
-        st.header("📝 Production Notes")
-        
-        # Using columns for a cleaner "Note" layout
-        n_col1, n_col2 = st.columns(2)
-        with n_col1:
-            st.info(f"**Format:** {content_note['📝content_format']}")
-            st.info(f"**Visual:** {content_note['🎨visual_concept']}")
-        with n_col2:
-            st.success(f"**Overlay:** {content_note['🔤overlay_text']}")
-            st.success(f"**Caption:** {content_note['💬caption_suggestion']}")
+            st.divider()
+
+            # 3. Final block check
+            st.header("📝 Production Notes")
+            if content_note:
+                n_col1, n_col2 = st.columns(2)
+                with n_col1:
+                    st.info(f"**Format:** {content_note.get('📝content_format', 'N/A')}")
+                    st.info(f"**Visual:** {content_note.get('🎨visual_concept', 'N/A')}")
+                with n_col2:
+                    st.success(f"**Overlay:** {content_note.get('🔤overlay_text', 'N/A')}")
+                    st.success(f"**Caption:** {content_note.get('💬caption_suggestion', 'N/A')}")
+            else:
+                st.warning("Production notes are missing.")
+
+    except IndexError:
+        st.error("🚨 **Error:** The idea list is empty. Please generate ideas first.")
+    except KeyError as e:
+        st.error(f"🚨 **Data Error:** Missing expected information: {e}")
+    except Exception as e:
+        # General catch-all with a detailed expansion for debugging
+        st.error("🚨 An unexpected error occurred while building the UI.")
+        with st.expander("Show Technical Details"):
+            st.code(traceback.format_exc())
+            
 
 # --- Streamlit App Layout ---
 st.set_page_config(page_title="Content Ideation Tool", layout="wide")
@@ -134,6 +157,67 @@ if st.session_state.content_ideas:
     st.write('---')
 
     display_native_storyboard(st.session_state.content_ideas, st.session_state.selected_influencer)
+
+
+
+# def display_native_storyboard(idea_data, selected_influencer_type):
+#     # Data extraction
+#     idea_data = idea_data[0]
+#     trend_name = idea_data['trend_name']
+#     trend_description = idea_data['trend_description']
+#     idea_title = idea_data['idea_title']
+#     idea_steps = idea_data['idea_steps']
+#     content_note = idea_data['content_note']
+
+#     # 1. Main Container (Replacing .idea-card)
+#     with st.container(border=True):
+#         st.subheader(f"💡 Ideation for {selected_influencer_type}")
+#         st.title(idea_title)
+        
+#         # Trend Context
+#         with st.expander("📌 View Trend Context", expanded=True):
+#             st.markdown(f"**Trend Name:** {trend_name}")
+#             st.markdown(f"**Description:** {trend_description}")
+
+#         st.divider()
+
+#         # 2. Idea Steps (Replacing .shot-item)
+#         st.header("🎬 Storyboard Steps")
+        
+#         for shot_key, shot_description in idea_steps.items():
+#             # Extract shot number for image filename
+#             shot_number = shot_key.split(' ')[1]
+#             image_filename = f"image/image_{str(shot_number)}.png"
+
+#             # Create a nested container for each shot
+#             with st.container(border=True):
+#                 col_text, col_img = st.columns([1, 1])
+                
+#                 with col_text:
+#                     st.markdown(f"### {shot_key.capitalize()}")
+#                     st.write(shot_description)
+                
+#                 with col_img:
+#                     if os.path.exists(image_filename):
+#                         # Native st.image handles local paths automatically
+#                         st.image(image_filename, width='stretch', caption=f"Visual for {shot_key}")
+#                     else:
+#                         st.warning(f"Image_{shot_number}.png not found.")
+
+#         st.divider()
+
+#         # 3. Content Notes (Replacing .content-note-list)
+#         st.header("📝 Production Notes")
+        
+#         # Using columns for a cleaner "Note" layout
+#         n_col1, n_col2 = st.columns(2)
+#         with n_col1:
+#             st.info(f"**Format:** {content_note['📝content_format']}")
+#             st.info(f"**Visual:** {content_note['🎨visual_concept']}")
+#         with n_col2:
+#             st.success(f"**Overlay:** {content_note['🔤overlay_text']}")
+#             st.success(f"**Caption:** {content_note['💬caption_suggestion']}")
+
 
 
 
