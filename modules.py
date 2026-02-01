@@ -141,69 +141,138 @@ def create_or_clear_folder(folder_path):
 
 
 def generate_images(content_ideas):
-    # Create shot-by-shot images for the generated ideas
-    # Store the shots by incremental numbering generated_image_n.png
-
     for idea in content_ideas:
-        i = 1 # File naming counter
-        # print("idea no:", idea['idea_no'])
+        i = 1 
         for shot in idea['idea_steps']:
-            
-            if i == 1:
+            try:
+                print(f"--- Processing: Idea {idea.get('idea_no', 'N/A')} | Shot {i} ---")
                 print(idea['idea_steps'][shot])
-                print("")
-                prompt = (
-                    f'''{idea['idea_steps'][shot]}.
+                
+                if i == 1:
+                    prompt = (
+                        f'''{idea['idea_steps'][shot]}.
+                        
+                        Additional instructions:
+                        - The character in the image must be a Malaysian character from any race in Malaysia.
+                        - Add in overlay texts where relevant and applicable, for example to introduce things.
+                        '''
+                    )
+                    response = client.models.generate_content(
+                        model="gemini-2.5-flash-image",
+                        contents=[prompt],
+                    )
+                else:
+                    prompt = (
+                        f'''
+                        Main input instruction:
+                        {idea['idea_steps'][shot]}.
+
+                        Additional instructions:
+                        - Use the main person from the attached image...
+                        ... (rest of your prompt) ...
+                        '''
+                    )
+                    # Check if the reference image exists before opening
+                    ref_path = f"image/image_1.png"
+                    try:
+                        reference_image = pilImage.open(ref_path)
+                    except FileNotFoundError:
+                        print(f"Error: Reference image {ref_path} not found. Skipping reference.")
+                        reference_image = None
+
+                    response = client.models.generate_content(
+                        model="gemini-2.5-flash-image",
+                        contents=[prompt, reference_image] if reference_image else [prompt],
+                    )
+
+                # --- Error Handling for API Response ---
+                if not response.candidates:
+                    print(f"Error: No candidates returned from model. It might be blocked by safety filters.")
+                    continue 
+
+                for part in response.candidates[0].content.parts:
+                    if part.text is not None:
+                        print(f"Model message: {part.text}")
+                    elif part.inline_data is not None:
+                        img_data = part.inline_data.data
+                        image = pilImage.open(io.BytesIO(img_data))
+                        image_resized = image.resize((300, 300), pilImage.Resampling.LANCZOS)
+                        
+                        # Ensure the directory exists
+                        image_resized.save(f"image/image_{i}.png")
+                        print(f"Successfully saved: image_{i}.png")
+
+                i += 1
+                time.sleep(30)
+
+            except Exception as e:
+                # This catches any other errors (Network, API limits, KeyErrors)
+                print(f"!!! An error occurred during shot {i}: {e}")
+                # Optional: print the full traceback for debugging
+                # traceback.print_exc() 
+                print("Moving to the next step...")
+                continue
+
+
+# def generate_images(content_ideas):
+#     # Create shot-by-shot images for the generated ideas
+#     # Store the shots by incremental numbering generated_image_n.png
+
+#     for idea in content_ideas:
+#         i = 1 # File naming counter
+#         # print("idea no:", idea['idea_no'])
+#         for shot in idea['idea_steps']:
+            
+#             if i == 1:
+#                 print(idea['idea_steps'][shot])
+#                 print("")
+#                 prompt = (
+#                     f'''{idea['idea_steps'][shot]}.
                     
-                    Additional instructions:
-                    - The character in the image must be a Malaysian character from any race in Malaysia.
-                    - Add in overlay texts where relevant and applicable, for example to introduce things.
-                    '''
-                )
+#                     Additional instructions:
+#                     - The character in the image must be a Malaysian character from any race in Malaysia.
+#                     - Add in overlay texts where relevant and applicable, for example to introduce things.
+#                     '''
+#                 )
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash-image",
-                    contents=[prompt],
-                )
+#                 response = client.models.generate_content(
+#                     model="gemini-2.5-flash-image",
+#                     contents=[prompt],
+#                 )
 
-            else:    
-                print(idea['idea_steps'][shot])
-                print("")
-                prompt = (
-                    f'''
-                    Main input instruction:
-                    {idea['idea_steps'][shot]}.
+#             else:    
+#                 print(idea['idea_steps'][shot])
+#                 print("")
+#                 prompt = (
+#                     f'''
+#                     Main input instruction:
+#                     {idea['idea_steps'][shot]}.
 
-                    Additional instructions:
-                    - Use the main person from the attached image as the character in the generated image, drop the initial speech bubble if any.
-                    - Remove the overlay texts from the reference image to prevent redundancy.
-                    - Use the setting from the attached image as the background in the generated image. The setting can change depending on the suitability and creativeness of the earlier main input instruction, but the similarity should be retained where it is applicable. For example, when a person is cooking, the setting should be the same kitchen as in the reference image. But the setting can change, for example to outside area or other area to fit the main input instruction.
-                    - Generate new speech bubbles if this is relevant, and add in overlay texts where relevant and applicable, for example to introduce certain things.
-                    '''
-                )
-                # Read the reference person image Created earlier to be included in the prompting
-                reference_image = pilImage.open("image/image_" + str(1) + ".png")
+#                     Additional instructions:
+#                     - Use the main person from the attached image as the character in the generated image, drop the initial speech bubble if any.
+#                     - Remove the overlay texts from the reference image to prevent redundancy.
+#                     - Use the setting from the attached image as the background in the generated image. The setting can change depending on the suitability and creativeness of the earlier main input instruction, but the similarity should be retained where it is applicable. For example, when a person is cooking, the setting should be the same kitchen as in the reference image. But the setting can change, for example to outside area or other area to fit the main input instruction.
+#                     - Generate new speech bubbles if this is relevant, and add in overlay texts where relevant and applicable, for example to introduce certain things.
+#                     '''
+#                 )
+#                 # Read the reference person image Created earlier to be included in the prompting
+#                 reference_image = pilImage.open("image/image_" + str(1) + ".png")
 
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash-image",
-                    contents=[prompt, reference_image],
-                )
+#                 response = client.models.generate_content(
+#                     model="gemini-2.5-flash-image",
+#                     contents=[prompt, reference_image],
+#                 )
 
-            for part in response.candidates[0].content.parts:
-                if part.text is not None:
-                    print(part.text)
-                elif part.inline_data is not None:
-                    # image = part.as_image()
-                    img_data = part.inline_data.data
-                    image = pilImage.open(io.BytesIO(img_data))
-                    image_resized = image.resize((300, 300), pilImage.Resampling.LANCZOS)
+#             for part in response.candidates[0].content.parts:
+#                 if part.text is not None:
+#                     print(part.text)
+#                 elif part.inline_data is not None:
+#                     # image = part.as_image()
+#                     img_data = part.inline_data.data
+#                     image = pilImage.open(io.BytesIO(img_data))
+#                     image_resized = image.resize((300, 300), pilImage.Resampling.LANCZOS)
 
-                    image_resized.save("image/image_" + str(i) + ".png")
+#                     image_resized.save("image/image_" + str(i) + ".png")
             
-            i = i+1
-            time.sleep(30)
-
-
-
-
-
+#             i = i+1
+#             time.sleep(30)
