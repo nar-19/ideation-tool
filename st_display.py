@@ -138,6 +138,7 @@ if st.session_state.trend_data:
             st.session_state.content_ideas = content_ideas
             
             st.write("Creating storyboard visuals...")
+            time.sleep(30)
 
             # Note: ensure generate_images saves to 'image/' folder
             # generate_images(st.session_state.content_ideas)
@@ -217,14 +218,4 @@ if st.session_state.content_ideas:
 #         with n_col2:
 #             st.success(f"**Overlay:** {content_note['🔤overlay_text']}")
 #             st.success(f"**Caption:** {content_note['💬caption_suggestion']}")
-
-
-
-
-
-
-
-
-
-
 
