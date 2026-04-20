@@ -12,18 +12,40 @@ import os, json, random, string, time, io, shutil
 client = genai.Client(api_key = st.secrets["API_KEY"])
 
 def generate_llm_output(prompt):
-    response_json = client.models.generate_content(
-        model="gemini-2.5-flash", 
-        contents = prompt
-    )
+    try:
+        response_json = client.models.generate_content(
+            model="gemini-2.5-flash", 
+            contents = prompt
+        )
+    
+        json_output = (response_json.text)
+        # print(json_output)
+        json_text = json_output.split("json")[1].replace("```","")
+        # Convert string type LLM outputs to a dictionary type
+        json_object = json.loads(json_text)
+    
+        return json_object
 
-    json_output = (response_json.text)
-    # print(json_output)
-    json_text = json_output.split("json")[1].replace("```","")
-    # Convert string type LLM outputs to a dictionary type
-    json_object = json.loads(json_text)
+    # This specifically catches the 429 error
+    except exceptions.ResourceExhausted as e:
+        st.error("⚠️ Error 429: Quota Exceeded. Please try again in a few moments.")
+        # Optional: log the error to the Streamlit console for your eyes only
+        print(f"Developer Log - Rate Limit Hit: {e}")
+        return None
 
-    return json_object
+    # Catching the specific 503 Service Unavailable exception
+    except exceptions.ServiceUnavailable:
+        st.error("Error 503: The Gemini service is currently overloaded. Please try again in a few moments.")
+        return None
+    
+    # Catch other API-related exceptions
+    except exceptions.GoogleAPICallError as e:
+        st.error(f"API Error: {e}")
+        return None
+        
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        return None
 
 
 def generate_trend():
