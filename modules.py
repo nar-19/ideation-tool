@@ -97,7 +97,7 @@ def generate_ideas(trend_data, influencer_type):
   [{"trend_name": "string", 
     "trend_description": "string",
     "idea_title":"string",
-    "idea_steps":{"🎬shot 1":"string","🎬shot 2":"string","🎬shot 3":"string"},
+    "idea_steps":{"🎬shot 1":"string","🎬shot 2":"string","🎬shot n":"string"},
     "content_note":{"📝content_format":"string","🎨visual_concept":"string","🔤overlay_text":"string","💬caption_suggestion":"string"}
     }]
   """
