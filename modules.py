@@ -203,7 +203,7 @@ def generate_images(content_ideas):
                         print(f"Successfully saved: image_{i}.png")
 
                 i += 1
-                time.sleep(20)
+                time.sleep(30)
 
             except Exception as e:
                 # This catches any other errors (Network, API limits, KeyErrors)
@@ -275,4 +275,4 @@ def generate_images(content_ideas):
 #                     image_resized.save("image/image_" + str(i) + ".png")
             
 #             i = i+1
-#             time.sleep(20)
+#             time.sleep(30)
