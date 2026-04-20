@@ -65,9 +65,11 @@ def display_native_storyboard(idea_data, selected_influencer_type):
                                 if os.path.exists(image_filename):
                                     st.image(image_filename, use_container_width=True, caption=f"Visual for {shot_key}")
                                 else:
-                                    st.warning(f"Image for {shot_key} is missing.")
+                                    # st.warning(f"Image for {shot_key} is missing.")
+                                    st.warning("⚠️ Error 429: Quota Exceeded @ Error 503: The Gemini service is currently overloaded. Please try again in a few moments.")
                     except Exception as shot_error:
                         st.error(f"Error rendering {shot_key}: {shot_error}")
+                        st.error("⚠️ Error 429: Quota Exceeded @ Error 503: The Gemini service is currently overloaded. Please try again in a few moments.")
 
             st.divider()
 
