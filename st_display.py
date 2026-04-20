@@ -138,7 +138,7 @@ if st.session_state.trend_data:
             st.session_state.content_ideas = content_ideas
             
             st.write("Creating storyboard visuals...")
-            time.sleep(30)
+            time.sleep(15)
 
             # Note: ensure generate_images saves to 'image/' folder
             # generate_images(st.session_state.content_ideas)
